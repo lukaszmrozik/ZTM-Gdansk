@@ -5,7 +5,7 @@ Projekt przetwarzania danych autobusowych przy użyciu skryptu Python oraz środ
 ---
 
 ## 🎯 **Funkcjonalności**  
-- Wczytywanie danych GPS autobusów z pliku JSON  
+- Wczytywanie danych GPS autobusów z pliku JSON lub TXT
 - Transformacja współrzędnych z WGS84 (EPSG:4326) na CS92 (EPSG:2180)  
 - Tworzenie punktowej warstwy mapy z pełnymi atrybutami pojazdów  
 - Obliczanie sumarycznego opóźnienia dla tras autobusowych  
@@ -27,7 +27,7 @@ Projekt przetwarzania danych autobusowych przy użyciu skryptu Python oraz środ
 - Upewnij się, że masz zainstalowany ArcGIS Pro z aktywną biblioteką `ArcPy`.
 
 ### 2. **Przygotuj dane wejściowe**  
-- Umieść plik `bus_data.json` w odpowiednim katalogu.  
+- Umieść plik `bus_data.json` lub `bus_data.txt`  w odpowiednim katalogu.  
 
 ### 3. **Skonfiguruj ścieżki w kodzie**  
 Zaktualizuj ścieżki do danych wejściowych i wynikowych w skrypcie:  

@@ -3,6 +3,7 @@ import json
 import os
 
 
+
 # Ustawienie ścieżki do geobazy oraz układu współrzędnych na EPSG:2180 (Polska CS92)
 arcpy.env.workspace = r"C:\Users\lukas\Documents\programowanie_gis\projekt\projekt_zal.gdb"
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(2180)
@@ -28,6 +29,7 @@ if not arcpy.Exists(output_shapefile):
         "POINT",
         spatial_reference=arcpy.SpatialReference(2180)  # Ustawienie układu współrzędnych
     )
+
 
 # Definiowanie pól atrybutów dla warstwy punktowej
 fields = [
@@ -84,6 +86,7 @@ with arcpy.da.InsertCursor(output_shapefile, ["SHAPE@", "tripId", "kierunek_prze
         #Pobranie sumy opóźnień dla danej linii
         opoznienie = route_delays.get(numer_linii, None)
 
+        
         #Sprawdzenie czy współrzędne są dostępne
         if lat is not None and lon is not None:
             # Tworzenie punktu w układzie WGS84

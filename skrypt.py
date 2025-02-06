@@ -2,6 +2,7 @@ import arcpy
 import json
 import os
 
+
 #Ustawinie ścieżki do geobazy oraz układu współrzędnych na EPSG:2180
 arcpy.env.workspace = r"C:\Users\lukas\Documents\programowanie_gis\projekt\projekt_zal.gdb"
 arcpy.env.outputCoordinateSystem = arcpy.SpatialReference(2180)
@@ -18,6 +19,7 @@ def read_bus_data(json_path):
   with open(json_path, 'r', encoding='utf-8') as file:
     data = json.load(file)
   return data['vehicles']
+
 
 #Tworzenie warstwy punktowej, jeśli jeszcze nie istnieje
 if not arcpy.Exists(output_shapefile):
@@ -56,4 +58,45 @@ spatial_ref_cs92 = arcpy.SpatialReference(2180)
 route_delays = {}
 
 
+#Obliczanie sumy opóźnień dla każdej linii
+for vehicle in bus_data:
+    numer_linii = vehicle.get("routeShortName", "")
+    opoznienie_przejazdu = vehicle.get("delay", 0)
+    if numer_linii not in route_delays:
+        route_delays[numer_linii] = 0
+    route_delays[numer_linii] += opoznienie_przejazdu
+
+
+#Wstawianie danych do warstwy shapefile
+with arcpy.da.InsertCursor(output_shapefile, ["SHAPE@", "tripId", "kierunek_przejazdu", "opoznienie_przejazdu", "numer_linii", "opoznienie_dla_przystanku", "rozpoczecie_kursu", "moment_zebrania_danych"]) as cursor:
+    for vehicle in bus_data:
+        lat = vehicle.get("lat")
+        lon = vehicle.get("lon")
+        trip_id = vehicle.get("tripId", 0)
+        kierunek_przejazdu = vehicle.get("headsign", "")
+        opoznienie_przejazdu = vehicle.get("delay", 0)  #Opóźnienie dla pojazdu
+        numer_linii = vehicle.get("routeShortName", "")
+        rozpoczecie_kursu = vehicle.get("scheduledTripStartTime", "")  #Czas rozpoczęcia kursu
+        
+        #Czas kiedy dane gps zostaly pobrane
+        moment_zebrania_danych = vehicle.get("generated", "") 
+      
+
+        #Pobranie sumy opóźnień dla danej linii
+        opoznienie = route_delays.get(numer_linii, None)
+
+        #Sprawdzenie czy współrzędne są dostępne
+        if lat is not None and lon is not None:
+            # Tworzenie punktu w układzie WGS84
+            point_wgs84 = arcpy.PointGeometry(arcpy.Point(lon, lat), spatial_ref_wgs84)
+            #przekształcenie współrzędnych do układu CS92
+            point_cs92 = point_wgs84.projectAs(spatial_ref_cs92)
+
+            #Debugowanie - wypisanie informacji o dodawanych punktach
+            print(f'Punkt: {point_cs92}, TripId: {trip_id}, Opóźnienie przejazdu: {opoznienie_przejazdu}, Kierunek przejazdu: {kierunek_przejazdu}, Numer linii: {numer_linii}, Opóźnienie dla trasy: {opoznienie}, Rozpoczęcie kursu: {rozpoczecie_kursu}, Moment zebrania danych: {moment_zebrania_danych}')
+
+            #Dodanie rekordu do warstwy
+            cursor.insertRow([point_cs92, trip_id, kierunek_przejazdu, opoznienie_przejazdu, numer_linii, opoznienie, rozpoczecie_kursu, moment_zebrania_danych])
+
+print("Punkty autobusowe zostały dodane do warstwy mapy wraz z pełnymi atrybutami.")
   

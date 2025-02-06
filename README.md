@@ -33,5 +33,5 @@ Projekt przetwarzania danych autobusowych przy użyciu skryptu Python oraz środ
 Zaktualizuj ścieżki do danych wejściowych i wynikowych w skrypcie:  
 ```python
 arcpy.env.workspace = r"C:\ścieżka_do_gdb"
-input_json_file = r"C:\ścieżka_do_danych\bus_data.txt"
+input_json_file = r"C:\ścieżka_do_danych\bus_data.json"
 output_shapefile = r"C:\ścieżka_do_wyniku\bus_output"
